@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 const input = await Bun.file("./input.txt").text();
 
 const leftList: number[] = [];
@@ -13,16 +11,14 @@ input
     rightList.push(Number(right!));
   });
 
-leftList.sort();
-rightList.sort();
-
 let sum = 0;
 
 for (let i = 0; i < leftList.length; i++) {
   const left = leftList[i]!;
-  const right = rightList[i]!;
 
-  sum += Math.abs(left - right);
+  const similarity = left * rightList.filter((right) => right === left).length;
+
+  sum += similarity;
 }
 
 console.log(sum);
