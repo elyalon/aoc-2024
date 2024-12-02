@@ -3,12 +3,28 @@ const input = await Bun.file("./input.txt").text();
 const safeAmount = input
   .split("\n")
   .map((line) => line.split(" ").map(Number))
-  .map(reportIsSafe)
+  .map((report) => {
+    if (reportIsSafe(report)) {
+      return true;
+    }
+
+    for (let i = 0; i < report.length; i++) {
+      const spliced = report.toSpliced(i, 1);
+
+      if (reportIsSafe(spliced)) {
+        return true;
+      }
+    }
+
+    return false;
+  })
   .filter((e) => e === true).length;
 
 console.log(safeAmount);
 
-function reportIsSafe(report: number[]): boolean {
+function reportIsSafe(reportParam: number[]): boolean {
+  const report = [...reportParam];
+
   const isIncreasing = report[0]! < report[1]!;
 
   let cur = report[0]!;
