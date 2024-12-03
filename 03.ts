@@ -1,4 +1,5 @@
 const input = await Bun.file("./input.txt").text();
+
 type Instruction =
   | { type: "Do" }
   | { type: "Don't" }
