@@ -1,17 +1,44 @@
 const input = await Bun.file("./input.txt").text();
+type Instruction =
+  | { type: "Do" }
+  | { type: "Don't" }
+  | { type: "Mul"; args: [number, number] };
 
-const regex = /mul\(\d\d?\d?,\d\d?\d?\)/g;
+const regex = /mul\(\d\d?\d?,\d\d?\d?\)|don't\(\)|do\(\)/g;
 
-const muls = input.matchAll(regex).toArray();
+const program = input
+  .matchAll(regex)
+  .map((e) => parseInstruction(e.toString()))
+  .toArray();
 
-const result = muls
-  .map((mul) => execMul(mul.toString()))
-  .reduce((acc, x) => acc + x, 0);
+let enabled = true;
+let sum = 0;
 
-console.log(result);
+for (const instr of program) {
+  if (instr.type === "Do") {
+    enabled = true;
+    continue;
+  }
+  if (instr.type === "Don't") {
+    enabled = false;
+    continue;
+  }
 
-function execMul(mul: string): number {
-  const [left, right] = mul.slice(4, -1).split(",").map(Number);
+  if (enabled) {
+    sum += instr.args[0] * instr.args[1];
+  }
+}
 
-  return left! * right!;
+console.log(sum);
+
+function parseInstruction(str: string): Instruction {
+  if (str === "do()") {
+    return { type: "Do" };
+  } else if (str === "don't()") {
+    return { type: "Don't" };
+  } else {
+    const [left, right] = str.slice(4, -1).split(",").map(Number);
+
+    return { type: "Mul", args: [left!, right!] };
+  }
 }
