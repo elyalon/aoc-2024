@@ -4,17 +4,6 @@ const CHARS = ["X", "M", "A", "S"] as const;
 
 type Char = (typeof CHARS)[number];
 
-const directions: [number, number][] = [
-  [-1, -1],
-  [-1, 0],
-  [-1, 1],
-  [0, -1],
-  [0, 1],
-  [1, -1],
-  [1, 0],
-  [1, 1],
-];
-
 const grid = input.split("\n").map((line) => line.split("") as Char[]);
 const colLength = grid.length;
 const rowLength = grid[0]!.length;
@@ -23,32 +12,26 @@ let sum = 0;
 
 for (let i = 0; i < colLength; i++) {
   for (let j = 0; j < rowLength; j++) {
-    for (const dir of directions) {
-      if (hasXmas(i, j, dir)) sum++;
-    }
+    if (isXmas(i, j)) sum++;
   }
 }
 
 console.log(sum);
 
-function hasXmas(row: number, col: number, dir: [number, number]): boolean {
-  const dirX = dir[0];
-  const dirY = dir[1];
+function isXmas(row: number, col: number): boolean {
+  if (row >= colLength - 1 || row < 1 || col >= rowLength - 1 || col < 1)
+    return false;
 
-  let curRow = row;
-  let curCol = col;
+  if (grid[row]![col]! !== "A") return false;
 
-  for (const charToMatch of CHARS) {
-    if (curRow >= colLength || curRow < 0 || curCol >= rowLength || curCol < 0)
-      return false;
+  const diag1 = [grid[row + 1]![col + 1]!, grid[row - 1]![col - 1]!]
+    .sort()
+    .join("");
+  const diag2 = [grid[row + 1]![col - 1]!, grid[row - 1]![col + 1]!]
+    .sort()
+    .join("");
 
-    const char = grid[curRow]![curCol]!;
-
-    if (char !== charToMatch) return false;
-
-    curRow += dirY;
-    curCol += dirX;
-  }
+  if (diag1 !== "MS" || diag2 !== "MS") return false;
 
   return true;
 }
